@@ -1,0 +1,41 @@
+---
+title: "Assessment1 part 1"
+author: "Yalan Huang S4664845"
+date: "14/08/2022"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(rtweet)
+
+```
+
+## Data import
+
+Step 1. collect tweets about football
+
+```{r}
+auth_setup_default()
+
+coffee_tweets<-search_tweets(
+  q="football",
+  n=15000,
+  include_rts = FALSE,
+  lang="en",
+  retryonratelimit = TRUE)
+
+```
+
+Step2. save as csv and name it with date
+
+```{r}
+football_tweets<-football_tweets%>%flatten()
+
+football_tweets%>%write_csv("14_08_2022.csv")
+
+```
+
