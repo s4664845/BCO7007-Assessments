@@ -13,3 +13,12 @@ football_tweets<-search_tweets(
 football_tweets<-football_tweets%>%flatten()
 
 football_tweets%>%write_csv("14_08_2022.csv")
+
+#merging and opening all csv files
+
+files<-list.files(pattern="\\.csv$",full.names = TRUE) 
+all_data<-map_df(files, ~read_csv(.x))
+
+#remove duplicate entries
+
+final_data<-all_data%>%distinct()
