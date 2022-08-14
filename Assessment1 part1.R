@@ -12,11 +12,11 @@ football_tweets<-search_tweets(
 
 football_tweets<-football_tweets%>%flatten()
 
+football_tweets%>%write_csv("12_08_2022.csv")
+
+football_tweets%>%write_csv("13_08_2022.csv")
+
 football_tweets%>%write_csv("14_08_2022.csv")
-
-football_tweets%>%write_csv("16_08_2022.csv")
-
-football_tweets%>%write_csv("18_08_2022.csv")
 
 #merging and opening all csv files
 
