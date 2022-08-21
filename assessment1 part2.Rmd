@@ -1,0 +1,171 @@
+---
+title: "Assessment1-part2"
+author: "Yalan Huang S4664845"
+date: "20/08/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(rtweet)
+```
+
+```{r}
+library(dplyr)
+```
+
+#merging and opening all csv files
+```{r}
+files<-list.files(pattern="\\.csv$",full.names = TRUE) 
+
+```
+#remove duplicate entries
+```{r}
+all_data<-map_df(files,  ~read_csv(.x))
+```
+
+
+```{r}
+final_data<-all_data%>%distinct()
+```
+
+#look at first 6 obs
+```{r}
+final_data%>%
+  head()
+
+```
+
+#look at structure
+```{r}
+final_data%>%
+  str()
+  
+```
+
+```{r}
+football_short<-final_data%>%
+  select(id, in_reply_to_screen_name, created_at, text, favorite_count, retweet_count,place)
+```
+
+
+##Present the first 10 tweets from your dataset using `kable()`
+
+```{r}
+library(knitr)
+
+kable(final_data[1:10,],"simple")
+```
+
+#Visualise the frequency of your tweets
+
+```{r}
+ts_plot(football_short, "hours") +
+  labs(x = NULL, y = NULL,
+       title = "Frequency of tweets with Football",
+       subtitle = paste0(format(min(football_short$created_at), "%d %B %Y"), " to ", format(max(football_short$created_at),"%d %B %Y")),
+       caption = "Football tweets Data collected from Twitter") +
+  theme_minimal()
+```
+
+#Identify top tweeting locations and present the first 10. 
+#Write 2-3 sentences on your insights from this.
+
+#This is the top 10 location. Because of the privacy, all the user did not share their location.As a result, there is no data.
+
+
+```{r}
+football_short %>% 
+  filter(!is.na(place)) %>% 
+  count(place, sort = TRUE) %>% 
+  top_n(10)
+```
+
+
+##Identify the most retweeted tweets and present top 20. 
+
+```{r}
+
+football_short %>% 
+  arrange(-retweet_count) %>%
+  slice(1) %>% 
+  select(created_at, in_reply_to_screen_name, text, retweet_count)
+```
+
+#top20
+```{r}
+
+football_short %>% 
+  arrange(-retweet_count) %>%
+  select(created_at, in_reply_to_screen_name, text, retweet_count) %>%
+  top_n(20)
+```
+
+##Identify the most liked tweets and present the first 15. 
+
+```{r}
+football_short %>% 
+  arrange(-favorite_count) %>%
+  top_n(15, favorite_count) %>% 
+  select(created_at, in_reply_to_screen_name, text, favorite_count)
+
+```
+
+##Identify top tweeters in your dataset and present the first 5. 
+
+```{r}
+
+football_short %>%
+  filter(!is.na(in_reply_to_screen_name)) %>%
+  count(in_reply_to_screen_name, sort = TRUE) %>%
+  top_n(5) %>%
+  mutate(screen_name = paste0("@", in_reply_to_screen_name)) 
+```
+
+##Identify top emojis in your dataset and present the first 10.
+
+```{r}
+library(emoji)
+library(tidyr)
+library(tidytext)
+
+```
+
+
+```{r}
+football_short %>% 
+  mutate(emoji = emoji_extract_all(text)) %>%
+  unnest(cols = c(emoji)) %>%
+  count(emoji, sort = TRUE) %>%
+  top_n(10)
+```
+
+##Identify top hashtags in your dataset and present the first 10. 
+
+```{r}
+football_short %>% 
+  unnest_tokens(hashtag, text, "tweets", to_lower = FALSE) %>%
+  filter(str_detect(hashtag, "^#"),
+         hashtag != "#foot") %>%
+  count(hashtag, sort = TRUE) %>%
+  top_n(10)
+```
+
+##Identify top mentions in your dataset and present the first 10.
+
+
+```{r}
+football_short %>% 
+  unnest_tokens(mentions, text, "tweets", to_lower = FALSE) %>%
+  filter(str_detect(mentions, "^@")) %>%  
+  count(mentions, sort = TRUE) %>%
+  top_n(10)
+```
+
